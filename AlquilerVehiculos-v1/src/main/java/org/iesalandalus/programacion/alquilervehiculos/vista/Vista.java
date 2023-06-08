@@ -15,6 +15,9 @@ public abstract class Vista {
 
     public abstract void comenzar();
     public abstract void terminar();
-    protected abstract void mostrarMenu();
-    protected abstract void ejecutar(int opcion);
+
+	protected Controlador getControlador() {
+		return controlador;
+	}
+  
 }
