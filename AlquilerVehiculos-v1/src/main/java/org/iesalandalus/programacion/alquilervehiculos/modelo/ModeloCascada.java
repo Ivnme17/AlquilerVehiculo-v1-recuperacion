@@ -1,158 +1,132 @@
 package org.iesalandalus.programacion.alquilervehiculos.modelo;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Alquiler;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Cliente;
-import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Turismo;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Vehiculo;
 
-public abstract class ModeloCascada extends Modelo {
+public class ModeloCascada extends Modelo {
 
-    private String modeloCascada;
+	public void comenzar() {
+		Cliente cliente1 = new Cliente("Bob Esponja", "11223344B", "950112233");
+		insertarCliente(cliente1);
 
-    public ModeloCascada() {
-        super();
-        modeloCascada = "";
-    }
+		Vehiculo vehiculo1 = new Vehiculo("Seat", "León", "1234BCD");
+		insertarvehiculo(vehiculo1);
 
+		LocalDate fechaAlquiler1 = LocalDate.now();
+		LocalDate fechaDevolucion1 = fechaAlquiler1.plus(5, ChronoUnit.DAYS);
+		Alquiler alquiler1 = new Alquiler(cliente1, vehiculo1, fechaAlquiler1, fechaDevolucion1);
+		abrirAlquiler(alquiler1);
 
-
-public abstract void comenzar();
-
-public String getModeloCascada() {
-    return modeloCascada;
-}
-
-public void setModeloCascada(String modeloCascada) {
-    this.modeloCascada = modeloCascada;
-}
-
-public void insertar(Cliente cliente) {
-	clientes.add(new Cliente(cliente));
-}
-
-public void insertar(Turismo turismo) {
-	turismos.add(new Turismo(turismo));
-}
-
-public void insertar(Alquiler alquiler) {
-	Cliente cliente = buscar(alquiler.getCliente().getDni());
-	Turismo turismo = buscar(alquiler.getTurismo().getMatricula());
-	if (cliente != null && turismo != null) {
-		alquileres.add(new Alquiler(alquiler));
+		System.out.println("El modelo ha comenzado.");
 	}
-}
-public Cliente buscar(Cliente dni) {
-	for (Cliente cliente : clientes) {
-		if (cliente.getDni().equals(dni)) {
-			return new Cliente(cliente);
+
+	public void terminar() {
+		System.out.println("El modelo ha terminado.");
+	}
+
+	public void insertarCliente(Cliente cliente) {
+		clientes.add(new Cliente(cliente.getNombre(), cliente.getDni(), cliente.getTelefono()));
+	}
+
+	public void insertarvehiculo(Vehiculo vehiculo) {
+		vehiculos.add(new Vehiculo(vehiculo.getMarca(), vehiculo.getModelo(), Vehiculo.getMatricula()));
+	}
+
+	public void abrirAlquiler(Alquiler alquiler) {
+		Cliente cliente = buscarCliente(alquiler.getCliente().getDni());
+		Vehiculo vehiculo = buscarVehiculo(alquiler.getVehiculo().getMatricula());
+		if (cliente != null && vehiculo != null) {
+			alquileres.add(new Alquiler(cliente, vehiculo, alquiler.getFechaAlquiler(), null));
 		}
 	}
-	return null;
-}
 
-public Vehiculo buscar(Vehiculo matricula) {
-	for (Vehiculo vehiculo: vehiculo) {
-		if (Vehiculo.getMatricula().equals(matricula)) {
-			return new Vehiculo(vehiculo);
+	public void cerrarAlquiler(Alquiler alquiler) {
+		for (Alquiler a : alquileres) {
+			if (a.getCliente().equals(alquiler.getCliente()) && a.getVehiculo().equals(alquiler.getVehiculo())
+					&& a.getFechaAlquiler().equals(alquiler.getFechaAlquiler()) && a.getFechaDevolucion() == null) {
+				a.setFechaDevolucion(LocalDate.now());
+				break;
+			}
 		}
 	}
-	return null;
-}
 
+	public Cliente buscarCliente(String dni) {
+		for (Cliente cliente : clientes) {
+			if (cliente.getDni().equals(dni)) {
+				return new Cliente(cliente.getNombre(), cliente.getDni(), cliente.getTelefono());
+			}
+		}
+		return null;
+	}
 
-public void borrar(String dni) {
-	for (int i = 0; i < clientes.size(); i++) {
-		Cliente cliente = clientes.get(i);
-		if (cliente.getDni().equals(dni)) {
-			clientes.remove(i);
-			borrarAlquileresPorCliente(cliente);
-			break;
+	public Vehiculo buscarVehiculo(String matricula) {
+		for (Vehiculo vehiculo : vehiculos) {
+			if (vehiculo.getMatricula().equals(matricula)) {
+				return new Vehiculo(vehiculo.getMarca(), vehiculo.getModelo(), vehiculo.getMatricula());
+			}
+		}
+		return null;
+	}
+
+	public void modificarCliente(String dni, String nuevoNombre, String nuevoTelefono) {
+		for (Cliente cliente : clientes) {
+			if (cliente.getDni().equals(dni)) {
+				cliente.setNombre(nuevoNombre);
+				cliente.setTelefono(nuevoTelefono);
+				break;
+			}
 		}
 	}
-}
-protected void borrarAlquileresPorCliente(Cliente cliente) {
-	List<Alquiler> alquileresCliente = new ArrayList<>();
-	for (Alquiler alquiler : alquileres) {
-		if (alquiler.getCliente().equals(cliente)) {
-			alquileresCliente.add(alquiler);
+
+	public void borrarCliente(String dni) {
+		for (int i = 0; i < clientes.size(); i++) {
+			if (clientes.get(i).getDni().equals(dni)) {
+				clientes.remove(i);
+				borrarAlquileresPorCliente(dni);
+				break;
+			}
 		}
 	}
-	alquileres.removeAll(alquileresCliente);
-}
 
-public void borrarVehiculo(String matricula) {
-	for (int i = 0; i < turismos.size(); i++) {
-		Turismo turismo = turismos.get(i);
-		if (turismo.getMatricula().equals(matricula)) {
-			turismos.remove(i);
-			borrarAlquileresPorVehiculo(turismo);
-			break;
+	private void borrarAlquileresPorCliente(String dni) {
+		List<Alquiler> alquileresCliente = new ArrayList<>();
+		for (Alquiler alquiler : alquileres) {
+			if (alquiler.getCliente().getDni().equals(dni)) {
+				alquileresCliente.add(alquiler);
+			}
 		}
+		alquileres.removeAll(alquileresCliente);
 	}
-}
 
-private void borrarAlquileresPorVehiculo(Turismo turismo) {
-	List<Alquiler> alquileresTurismo = new ArrayList<>();
-	for (Alquiler alquiler : alquileres) {
-		if (alquiler.getTurismo().equals(turismo)) {
-			alquileresTurismo.add(alquiler);
+	public List<Cliente> getClientes() {
+		List<Cliente> copiaClientes = new ArrayList<>();
+		for (Cliente cliente : clientes) {
+			copiaClientes.add(new Cliente(cliente.getNombre(), cliente.getDni(), cliente.getTelefono()));
 		}
+		return copiaClientes;
 	}
-	alquileres.removeAll(alquileresTurismo);
-}
 
-
-
-public void mostrarClientes() {
-	for (Cliente cliente : clientes) {
-		System.out.println(cliente);
+	public List<Vehiculo> getvehiculos() {
+		List<Vehiculo> copiavehiculos = new ArrayList<>();
+		for (Vehiculo vehiculo : vehiculos) {
+			copiavehiculos.add(new Vehiculo(vehiculo.getMarca(), vehiculo.getModelo(), vehiculo.getMatricula()));
+		}
+		return copiavehiculos;
 	}
-}
 
-
-
-
-public void mostrarVehiculos() {
-    for (Vehiculo vehiculo : vehiculos) {
-        System.out.println(vehiculo);
-    }
-}
-
-public void abrirAlquiler(String dni, String matricula) {
-    Cliente cliente = buscar(dni);
-    Vehiculo vehiculo = buscar(matricula);
-    if (cliente != null && vehiculo != null) {
-        Alquiler alquiler = new Alquiler(cliente, vehiculo);
-        alquileres.add(alquiler);
-    }
-}
-
-public void cerrarAlquiler(String dni, String matricula) {
-    Cliente cliente = buscar(dni);
-    Vehiculo vehiculo = buscar(matricula);
-    if (cliente != null && vehiculo != null) {
-        Alquiler alquiler = buscarAlquilerAbierto(cliente, vehiculo);
-        if (alquiler != null) {
-            alquiler.cerrar();
-        }
-    }
-}
-
-public Alquiler buscarAlquilerAbierto(Cliente cliente, Vehiculo vehiculo) {
-    for (Alquiler alquiler : alquileres) {
-        if (alquiler.getCliente().equals(cliente) && alquiler.getVehiculo().equals(vehiculo) && alquiler.getFechaRetirada() != null && alquiler.getFechaDevolucion() == null) {
-            return alquiler;
-        }
-    }
-    return null;
-}
-
-public void mostrarAlquileres() {
-    for (Alquiler alquiler : alquileres) {
-        System.out.println(alquiler);
-    }
-}
+	public List<Alquiler> getAlquileres() {
+		List<Alquiler> copiaAlquileres = new ArrayList<>();
+		for (Alquiler alquiler : alquileres) {
+			copiaAlquileres.add(new Alquiler(alquiler.getCliente(), alquiler.getVehiculo(), alquiler.getFechaAlquiler(),
+					alquiler.getFechaDevolucion()));
+		}
+		return copiaAlquileres;
+	}
 }

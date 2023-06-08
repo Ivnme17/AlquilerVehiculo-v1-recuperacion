@@ -4,189 +4,163 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.OperationNotSupportedException;
+
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Alquiler;
 import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Cliente;
-import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Turismo;
-import org.iesalandalus.programacion.alquilervehiculos.vista.texto.TipoVehiculo;
+import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Vehiculo;
 
 public abstract class Modelo {
-
-	protected List<Cliente> clientes;
-	protected List<Turismo> turismos;
+	protected static List<Cliente> clientes;
+	protected List<Vehiculo> vehiculos;
 	protected List<Alquiler> alquileres;
 
 	public Modelo() {
 		this.clientes = new ArrayList<>();
-		this.turismos = new ArrayList<>();
+		this.vehiculos = new ArrayList<>();
 		this.alquileres = new ArrayList<>();
 	}
 
 	public abstract void comenzar();
 
-	public void terminar() {
-		System.out.println("El modelo ha terminado.");
+	public abstract void terminar();
+
+	public void insertarCliente(Cliente cliente) {
+		clientes.add(cliente);
 	}
 
-	public void insertar(Cliente cliente) {
-		clientes.add(new Cliente(cliente));
+	public void insertarVehiculo(Vehiculo vehiculo) {
+		vehiculos.add(vehiculo);
 	}
 
-	public void insertar(Turismo turismo) {
-		turismos.add(new Turismo(turismo));
+	public void abrirAlquiler(Alquiler alquiler) {
+		alquileres.add(alquiler);
 	}
 
-	public void insertar(Alquiler alquiler) {
-		Cliente cliente = buscar(alquiler.getCliente().getDni());
-		Turismo turismo = buscar(alquiler.getTurismo().getMatricula());
-		if (cliente != null && turismo != null) {
-			alquileres.add(new Alquiler(alquiler));
-		}
+	public void cerrarAlquiler(Alquiler alquiler) {
+		alquiler.setFechaDevolucion(LocalDate.now());
 	}
 
-	public Cliente buscar(Cliente dni) {
-		for (Cliente cliente : clientes) {
-			if (cliente.getDni().equals(dni)) {
-				return new Cliente(cliente);
+	public static Cliente buscarCliente(Cliente cliente) {
+	    for (Cliente c : clientes) {
+	        if (c.getDni().equals(cliente.getDni())) {
+	            return c;
+	        }
+	    }
+	    return null;
+	}
+
+	public Vehiculo buscarVehiculo(Vehiculo vehiculo) {
+	    for (Vehiculo v : vehiculos) {
+	        if (v.getMatricula().equals(vehiculo.getMatricula())) {
+	            return v;
+	        }
+	    }
+	    return null;
+	}
+
+
+	public Alquiler buscarAlquiler(Cliente cliente, Vehiculo vehiculo) {
+		for (Alquiler alquiler : alquileres) {
+			if (alquiler.getCliente().equals(cliente) && alquiler.getVehiculo().equals(vehiculo)
+					&& alquiler.getFechaDevolucion() == null) {
+				return alquiler;
 			}
 		}
 		return null;
 	}
 
-	public Turismo buscar(Turismo matricula) {
-		for (Turismo turismo : turismos) {
-			if (turismo.getMatricula().equals(matricula)) {
-				return new Turismo(turismo);
-			}
-		}
-		return null;
+	public static void modificarCliente(Cliente cliente, String nombre, String telefono) throws OperationNotSupportedException {
+	    Cliente clienteEncontrado = buscarCliente(cliente);
+	    if (clienteEncontrado != null) {
+	        clienteEncontrado.setNombre(nombre);
+	        clienteEncontrado.setTelefono(telefono);
+	        Modelo.modificarCliente(clienteEncontrado, nombre, telefono);
+	        System.out.println("Cliente modificado correctamente.");
+	    } else {
+	        System.out.println("No se encontró ningún cliente con el DNI: " + cliente.getDni());
+	    }
 	}
 
-	public void modificar(Alquiler alquiler) {
-		for (int i = 0; i < alquileres.size(); i++) {
-			Alquiler a = alquileres.get(i);
-			if (a.getId().equals(alquiler.getId())) {
-				alquileres.set(i, new Alquiler(alquiler));
-				return;
-			}
-		}
+
+	public void borrarCliente(Cliente cliente) {
+	    if (cliente != null) {
+	        clientes.remove(cliente);
+	        System.out.println("Cliente eliminado correctamente.");
+	    }
 	}
 
-	public boolean devolver(Alquiler alquiler) {
-		for (int i = 0; i < alquileres.size(); i++) {
-			Alquiler a = alquileres.get(i);
-			if (a.equals(alquiler) && a.getEstado().equals("En curso")) {
-				a.setEstado("Finalizado");
-				return true;
-			}
-		}
-		return false;
+	public void borrarVehiculo(Vehiculo vehiculo) {
+	    if (vehiculo != null) {
+	        vehiculos.remove(vehiculo);
+	        System.out.println("Vehículo eliminado correctamente.");
+	    }
 	}
 
-	public void borrar(String dni) {
-		for (int i = 0; i < clientes.size(); i++) {
-			Cliente cliente = clientes.get(i);
-			if (cliente.getDni().equals(dni)) {
-				clientes.remove(i);
-				borrarAlquileresPorCliente(cliente);
-				break;
-			}
+
+
+	public void borrarAlquiler(Cliente cliente, Vehiculo vehiculo) {
+		Alquiler alquiler = buscarAlquiler(cliente, vehiculo);
+		if (alquiler != null) {
+			alquileres.remove(alquiler);
 		}
 	}
 
-	protected void borrarAlquileresPorCliente(Cliente cliente) {
+	public List<Cliente> getClientes() {
+		return clientes;
+	}
+
+	public List<Vehiculo> getVehiculos() {
+		return vehiculos;
+	}
+
+	public List<Alquiler> getAlquileres() {
+		return alquileres;
+	}
+
+	public List<Alquiler> getAlquileres(Cliente cliente) {
 		List<Alquiler> alquileresCliente = new ArrayList<>();
 		for (Alquiler alquiler : alquileres) {
 			if (alquiler.getCliente().equals(cliente)) {
 				alquileresCliente.add(alquiler);
 			}
 		}
-		alquileres.removeAll(alquileresCliente);
+		return alquileresCliente;
 	}
 
-	public void borrarTurismo(String matricula) {
-		for (int i = 0; i < turismos.size(); i++) {
-			Turismo turismo = turismos.get(i);
-			if (turismo.getMatricula().equals(matricula)) {
-				turismos.remove(i);
-				borrarAlquileresPorTurismo(turismo);
-				break;
-			}
-		}
-	}
-
-	private void borrarAlquileresPorTurismo(Turismo turismo) {
-		List<Alquiler> alquileresTurismo = new ArrayList<>();
+	public List<Alquiler> getAlquileres(Vehiculo vehiculo) {
+		List<Alquiler> alquileresVehiculo = new ArrayList<>();
 		for (Alquiler alquiler : alquileres) {
-			if (alquiler.getTurismo().equals(turismo)) {
-				alquileresTurismo.add(alquiler);
+			if (alquiler.getVehiculo().equals(vehiculo)) {
+				alquileresVehiculo.add(alquiler);
 			}
 		}
-		alquileres.removeAll(alquileresTurismo);
+		return alquileresVehiculo;
 	}
 
-	public List<Cliente> getClientes() {
-		List<Cliente> listaClientes = new ArrayList<>();
-		for (Cliente cliente : clientes) {
-			listaClientes.add(new Cliente(cliente));
-		}
-		return listaClientes;
-	}
-
-	public List<Turismo> getTurismos() {
-		List<Turismo> listaTurismos = new ArrayList<>();
-		for (Turismo turismo : turismos) {
-			listaTurismos.add(new Turismo(turismo));
-		}
-		return listaTurismos;
-	}
-
-	public List<Alquiler> getAlquileres() {
-		List<Alquiler> listaAlquileres = new ArrayList<>();
+	public List<Alquiler> getAlquileres(Cliente cliente, Vehiculo vehiculo) {
+		List<Alquiler> alquileresClienteVehiculo = new ArrayList<>();
 		for (Alquiler alquiler : alquileres) {
-			listaAlquileres.add(new Alquiler(alquiler));
+			if (alquiler.getCliente().equals(cliente) && alquiler.getVehiculo().equals(vehiculo)) {
+				alquileresClienteVehiculo.add(alquiler);
+			}
 		}
-		return listaAlquileres;
+		return alquileresClienteVehiculo;
 	}
 
-	public void modificar(String dni, String nuevoNombre, String nuevoTelefono) {
-		Cliente cliente = buscar(dni);
-		if (cliente != null) {
-			cliente.setNombre(nuevoNombre);
-			cliente.setTelefono(nuevoTelefono);
-		}
-	}
-
-	public void mostrarListaClientes() {
-		for (Cliente cliente : clientes) {
-			System.out.println(cliente);
-		}
-	}
-
-	public void registrarAlquiler(String dniCliente, String codigoVehiculo, LocalDate fechaAlquiler,
-			LocalDate FechaDevolucion) {
-		Cliente cliente = buscar(dniCliente);
-		Turismo turismo = buscar(codigoVehiculo);
-		if (cliente != null && turismo != null) {
-			Alquiler alquiler = new Alquiler(cliente, turismo, fechaAlquiler, FechaDevolucion);
-			insertar(alquiler);
-		}
-	}
-
-	public void finalizarAlquiler(String codigoVehiculo) {
-		Turismo turismo = buscar(codigoVehiculo);
-		if (turismo != null) {
-			for (Alquiler alquiler : alquileres) {
-				if (alquiler.getTurismo().equals(turismo) && alquiler.getEstado().equals("En curso")) {
-					alquiler.setEstado("Finalizado");
-					return;
-				}
+	public void devolverVehiculo(Vehiculo vehiculo) {
+		for (Alquiler alquiler : alquileres) {
+			if (alquiler.getVehiculo().equals(vehiculo) && alquiler.getFechaDevolucion() == null) {
+				alquiler.setFechaDevolucion(LocalDate.now());
 			}
 		}
 	}
 
-	public abstract String getModeloCascada();
-
-	public abstract void setModeloCascada(String modeloCascada);
-
-	public abstract String buscarTipoVehiculo(TipoVehiculo tipoVehiculo);
+	public void devolverVehiculos(Vehiculo vehiculo) {
+		for (Alquiler alquiler : alquileres) {
+			if (alquiler.getCliente().equals(vehiculo) && alquiler.getFechaDevolucion() == null) {
+				alquiler.setFechaDevolucion(LocalDate.now());
+			}
+		}
+	}
 }
