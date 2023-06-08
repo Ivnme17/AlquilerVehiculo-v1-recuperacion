@@ -18,11 +18,11 @@ public class Alquileres implements IAlquileres {
     }
 
     @Override
-	public List<Alquiler> get(Turismo turismo) {
+	public List<Alquiler> get(Vehiculo vehiculo) {
 		ArrayList<Alquiler> arrayAlquileresCliente = new ArrayList<>();
 
 		for (Alquiler alquilerLista : Coleccionalquileres) {
-			if (alquilerLista.getTurismo().equals(turismo)) {
+			if (alquilerLista.getVehiculo().equals(vehiculo)) {
 				arrayAlquileresCliente.add(alquilerLista);}}
 		return arrayAlquileresCliente;
 			
@@ -54,10 +54,10 @@ public class Alquileres implements IAlquileres {
             if (a.getCliente().equals(alquiler.getCliente()) && a.getFechaDevolucion() == null) {
                 return false;
             }
-            if (a.getTurismo().equals(alquiler.getTurismo()) && a.getFechaDevolucion() == null) {
+            if (a.getVehiculo().equals(alquiler.getVehiculo()) && a.getFechaDevolucion() == null) {
                 return false;
             }
-            if (a.getCliente().equals(alquiler.getCliente()) && a.getTurismo().equals(alquiler.getTurismo())
+            if (a.getCliente().equals(alquiler.getCliente()) && a.getVehiculo().equals(alquiler.getVehiculo())
                     && a.getFechaAlquiler().isBefore(alquiler.getFechaDevolucion())
                     && (a.getFechaDevolucion() == null || a.getFechaDevolucion().isAfter(alquiler.getFechaAlquiler()))) {
                 return false;
@@ -74,7 +74,7 @@ public class Alquileres implements IAlquileres {
 		}
 
 		if (!Coleccionalquileres.contains(alquiler)) {
-			comprobarAlquiler(alquiler.getCliente(), alquiler.getTurismo(), alquiler.getFechaAlquiler());
+			comprobarAlquiler(alquiler.getCliente(), alquiler.getVehiculo(), alquiler.getFechaAlquiler());
 			Coleccionalquileres.add(alquiler);
 		}
 
@@ -83,7 +83,7 @@ public class Alquileres implements IAlquileres {
 	}
 
 
-	private void comprobarAlquiler(Cliente cliente, Turismo turismo, LocalDate fechaAlquiler)
+	private void comprobarAlquiler(Cliente cliente, Vehiculo vehiculo, LocalDate fechaAlquiler)
 			throws OperationNotSupportedException {
 		for (Alquiler alquiler : Coleccionalquileres) {
 		
@@ -92,7 +92,7 @@ public class Alquileres implements IAlquileres {
 				if (alquiler.getCliente().equals(cliente)) {
 					throw new OperationNotSupportedException("ERROR: El cliente tiene otro alquiler sin devolver.");
 				}
-				if (alquiler.getTurismo().equals(turismo)) {
+				if (alquiler.getVehiculo().equals(vehiculo)) {
 
 					throw new OperationNotSupportedException("ERROR: El turismo está actualmente alquilado.");
 				}
@@ -103,7 +103,7 @@ public class Alquileres implements IAlquileres {
 						|| alquiler.getFechaDevolucion().isEqual(fechaAlquiler))) {
 					throw new OperationNotSupportedException("ERROR: El cliente tiene un alquiler posterior.");
 				}
-				if (alquiler.getTurismo().equals(turismo) && (alquiler.getFechaDevolucion().isAfter(fechaAlquiler)
+				if (alquiler.getVehiculo().equals(vehiculo) && (alquiler.getFechaDevolucion().isAfter(fechaAlquiler)
 						|| alquiler.getFechaDevolucion().isEqual(fechaAlquiler))) {
 					throw new OperationNotSupportedException("ERROR: El turismo tiene un alquiler posterior.");
 				}

@@ -1,31 +1,24 @@
 package org.iesalandalus.programacion.alquilervehiculos.modelo.dominio;
 
 public class Furgoneta extends Vehiculo {
-	private int FACTOR_PMA;
-	private int FACTOR_PLAZAS;
 	private int pma;
 	private int plazas;
+	private static final int FACTOR_PMA = 100;
+	private static final int FACTOR_PLAZAS = 1;
 
-	public Furgoneta(String marca, String modelo, String matricula, int pma) {
-		super(marca, modelo, pma, matricula);
-		setModelo(modelo);
-		setMarca(marca);
+	public Furgoneta(String marca, String modelo, String matricula, int pma, int plazas) {
+		super(marca, modelo, matricula);
 		setPma(pma);
-		setMatricula(matricula);
+		setPlazas(plazas);
 	}
 
-	public Vehiculo Furgoneta(Furgoneta furgoneta) { // Constructor copia
+	public Furgoneta(Furgoneta furgoneta) { // Constructor copia
+		super(furgoneta);
 		if (furgoneta == null) {
 			throw new NullPointerException("ERROR: El valor de furgoneta no puede ser nulo.");
 		}
-		this.pma = 7000;
-		this.plazas = 2;
-		return furgoneta;
-	}
-
-	@Override
-	public double getFactorPrecio() {
-		return 1.2;
+		setPma(pma);
+		setPlazas(plazas);
 	}
 
 	public int getPma() {
@@ -44,5 +37,13 @@ public class Furgoneta extends Vehiculo {
 		this.plazas = plazas;
 	}
 
+	public double getFactorPrecio() {
+		return pma / FACTOR_PMA + plazas * FACTOR_PLAZAS;
+	}
+
+	@Override
+	public String toString() {
+		return "Furgoneta [pma=" + pma + ", plazas=" + plazas + "]";
+	}
 
 }

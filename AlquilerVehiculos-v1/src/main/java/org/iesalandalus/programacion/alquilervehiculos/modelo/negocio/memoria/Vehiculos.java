@@ -4,51 +4,59 @@ import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Turismo;
+import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Vehiculo;
+import org.iesalandalus.programacion.alquilervehiculos.modelo.dominio.Vehiculo;
+import org.iesalandalus.programacion.alquilervehiculos.modelo.negocio.IVehiculos;
 
-public class Vehiculos {
+public class Vehiculos implements IVehiculos {
 
-    private List<Turismo> coleccionTurismos;
+    private List<Vehiculo> coleccionVehiculos;
 
     public Vehiculos() {
-        this.coleccionTurismos = new ArrayList<>();
+        this.coleccionVehiculos = new ArrayList<>();
     }
 
-    public List<Turismo> get() {
-        return new ArrayList<>(coleccionTurismos);
+    @Override
+	public List<Vehiculo> get() {
+        return new ArrayList<>(coleccionVehiculos);
     }
 
-    public int getCantidad() {
-        return coleccionTurismos.size();
+    @Override
+	public int getCantidad() {
+        return coleccionVehiculos.size();
     }
 
-    public void insertar(Turismo turismo) throws OperationNotSupportedException {
-    	 if (turismo == null) {
-         	throw new NullPointerException("ERROR: No se puede insertar un turismo nulo.");
+    @Override
+	public void insertar(Vehiculo Vehiculo) throws OperationNotSupportedException {
+    	 if (Vehiculo == null) {
+         	throw new NullPointerException("ERROR: No se puede insertar un Vehiculo nulo.");
          }
-    	if (turismo != null && !coleccionTurismos.contains(turismo)) {
-            coleccionTurismos.add(turismo);
-            }else { throw new OperationNotSupportedException("ERROR: Ya existe un turismo con esa matrícula.");
+    	if (Vehiculo != null && !coleccionVehiculos.contains(Vehiculo)) {
+            coleccionVehiculos.add(Vehiculo);
+            }else { throw new OperationNotSupportedException("ERROR: Ya existe un Vehiculo con esa matrícula.");
             }
         }
 
-    public Turismo buscar(Turismo turismo) {
-        int index = coleccionTurismos.indexOf(turismo);
+    @Override
+	public Vehiculo buscar(Vehiculo Vehiculo) {
+        int index = coleccionVehiculos.indexOf(Vehiculo);
         if (index >= 0) {
-            return coleccionTurismos.get(index);
-        }else if (turismo==null){
-            throw new NullPointerException("ERROR: No se puede buscar un turismo nulo.");
+            return coleccionVehiculos.get(index);
+        }else if (Vehiculo==null){
+            throw new NullPointerException("ERROR: No se puede buscar un Vehiculo nulo.");
         }
 		return null;
     }
 
-    public void borrar(Turismo turismo) throws OperationNotSupportedException {
-    	if (turismo == null) {
-        	throw new NullPointerException("ERROR: No se puede borrar un turismo nulo.");
+    @Override
+	public void borrar(Vehiculo Vehiculo) throws OperationNotSupportedException {
+    	if (Vehiculo == null) {
+        	throw new NullPointerException("ERROR: No se puede borrar un Vehiculo nulo.");
         }
     
-    	if (!coleccionTurismos.remove(turismo)) {
-            throw new OperationNotSupportedException("ERROR: No existe ningún turismo con esa matrícula."); 
+    	if (!coleccionVehiculos.remove(Vehiculo)) {
+            throw new OperationNotSupportedException("ERROR: No existe ningún Vehiculo con esa matrícula."); 
 }
 }
+
 }

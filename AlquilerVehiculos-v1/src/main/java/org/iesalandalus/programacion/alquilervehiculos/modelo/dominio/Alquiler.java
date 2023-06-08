@@ -7,20 +7,20 @@ import java.util.Objects;
 public class Alquiler {
 	private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private static final int PRECIO_DIA = 20;
-	private LocalDate fechaAlquiler;
+	private static LocalDate fechaAlquiler;
 	private LocalDate fechaDevolucion;
-	private Cliente cliente;
-	private Turismo turismo;
+	private static Cliente cliente;
+	private Vehiculo vehiculo;
 
-	public Alquiler(Cliente cliente, Turismo turismo, LocalDate fechaAlquiler, LocalDate fechaDevolucion) {
+	public Alquiler(Cliente cliente, Vehiculo vehiculo, LocalDate fechaAlquiler, LocalDate fechaDevolucion) {
 		setCliente(cliente);
-		setTurismo(turismo);
+		setVehiculo(vehiculo);
 		setFechaAlquiler(fechaAlquiler);
 		setFechaDevolucion(fechaDevolucion);
 	}
 
 	public Alquiler(Alquiler alquiler) {
-		this(new Cliente(alquiler.getCliente()), new Turismo(alquiler.getTurismo()), alquiler.getFechaAlquiler(),
+		this(new Cliente(alquiler.getCliente()), new Turismo(alquiler.getVehiculo()), alquiler.getFechaAlquiler(),
 				alquiler.getFechaDevolucion());
 	}
 
@@ -51,11 +51,11 @@ public class Alquiler {
 		this.cliente = cliente;
 	}
 
-	private void setTurismo(Turismo turismo) {
-		this.turismo = turismo;
+	private void setVehiculo(Vehiculo vehiculo) {
+		this.vehiculo = vehiculo;
 	}
 
-	public LocalDate getFechaAlquiler() {
+	public static LocalDate getFechaAlquiler() {
 		return fechaAlquiler;
 	}
 
@@ -63,17 +63,17 @@ public class Alquiler {
 		return fechaDevolucion;
 	}
 
-	public Cliente getCliente() {
+	public static Cliente getCliente() {
 		return cliente;
 	}
 
-	public Turismo getTurismo() {
-		return turismo;
+	public Vehiculo getVehiculo() {
+		return vehiculo;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(cliente, fechaAlquiler, fechaDevolucion, turismo);
+		return Objects.hash(cliente, fechaAlquiler, fechaDevolucion, vehiculo);
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class Alquiler {
 			return false;
 		Alquiler other = (Alquiler) obj;
 		return Objects.equals(cliente, other.cliente) && Objects.equals(fechaAlquiler, other.fechaAlquiler)
-				&& Objects.equals(fechaDevolucion, other.fechaDevolucion) && Objects.equals(turismo, other.turismo);
+				&& Objects.equals(fechaDevolucion, other.fechaDevolucion) && Objects.equals(vehiculo, other.vehiculo);
 	}
 
 	@Override
@@ -94,6 +94,6 @@ public class Alquiler {
 		return String.format(
 				"Alquiler [FORMATO_FECHA=%s, PRECIO_DIA=%s, fechaAlquiler=%s, fechaDevolucion=%s, cliente=%s, turismo=%s]",
 				FORMATO_FECHA, PRECIO_DIA, FORMATO_FECHA.format(fechaAlquiler), FORMATO_FECHA.format(fechaDevolucion),
-				cliente, turismo);
+				cliente, vehiculo);
 	}
 }

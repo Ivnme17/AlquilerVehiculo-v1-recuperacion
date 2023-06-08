@@ -1,14 +1,12 @@
 package org.iesalandalus.programacion.alquilervehiculos.modelo.dominio;
 
-import java.util.Objects;
-
 public class Turismo extends Vehiculo {
-	int cilindrada;
-	private int FACTOR_CILINDRADA;
+	private int cilindrada;
+	private static final int FACTOR_CILINDRADA = 10;
 
 	public Turismo(String marca, String modelo, int cilindrada, String matricula) {
-		super(marca, modelo, cilindrada, matricula);
-		this.cilindrada = cilindrada;
+		super(marca, modelo, matricula);
+		setCilindrada(cilindrada);
 	}
 
 	public Turismo(Vehiculo vehiculo) { // Turismo copia
@@ -19,11 +17,6 @@ public class Turismo extends Vehiculo {
 		setCilindrada(cilindrada);
 	}
 
-	@Override
-	public double getFactorPrecio() {
-		return 1.5;
-	}
-
 	public int getCilindrada() {
 		return cilindrada;
 	}
@@ -32,9 +25,12 @@ public class Turismo extends Vehiculo {
 		this.cilindrada = cilindrada;
 	}
 
+	public double getFactorPrecio() {
+		return cilindrada / FACTOR_CILINDRADA;
+	}
+
 	@Override
 	public String toString() {
 		return String.format("Turismo [cilindrada=%s, FACTOR_CILINDRADA=%s]", cilindrada, FACTOR_CILINDRADA);
 	}
-
 }

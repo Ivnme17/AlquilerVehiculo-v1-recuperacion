@@ -1,11 +1,11 @@
 package org.iesalandalus.programacion.alquilervehiculos.modelo.dominio;
 
 public class Autobus extends Vehiculo {
-private int FACTOR_PLAZAS;
+private int FACTOR_PLAZAS = 2;
 private int plazas;
 	public Autobus(String marca, String modelo, String matricula, int plazas) {
-		super(marca, modelo, plazas, matricula);
-		this.plazas = plazas;
+		super(marca, modelo,matricula);
+		setPlazas(plazas);
 	}
 
 	public Vehiculo Autobus (Autobus autobus) {//Constructor copia
@@ -23,9 +23,8 @@ private int plazas;
 		return plazas;
 	}
 
-	@Override
 	public double getFactorPrecio() {
-		return 1.5;
+		return plazas * FACTOR_PLAZAS;
 	}
 	
 	public Autobus copiar() {
